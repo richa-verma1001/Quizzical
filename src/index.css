@@ -1,0 +1,73 @@
+:root {
+  font-family: Karla, system-ui, Avenir, Helvetica, Arial, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+
+  color-scheme: light dark;
+  color: #ffffffde;
+  background-color: #242424;
+  --shadow: 1px 5px 5px rgba(104, 104, 104, 0.8);
+
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.container {
+  background-color: #F5F7FB;
+  color: #293264;
+  width: 50vw;
+  height: auto;
+  margin: 3rem;
+  padding: 1rem;
+  border-radius: 5px;
+}
+
+main {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.frontpage {
+  text-align: center;
+}
+
+button {
+  background-color: #4D5B9E;
+  color: #F5F7FB;
+  border: none;
+  box-shadow: var(--shadow);
+  padding: 0.5rem;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.frontpage__start-game {
+  
+}
+
+
+fieldset {
+  border: none;
+}
+
+form {
+  display: flex;
+  flex-direction: column;
+}
+
+li {
+  list-style: none;
+}
+
