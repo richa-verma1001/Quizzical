@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import Cover from "./Cover";
 import { nanoid } from "nanoid";
+import { encode, decode } from "html-entities";
 
 function App() {
   const [screen, setScreen] = useState("screen1");
@@ -12,7 +13,7 @@ function App() {
 
   function getQuestions() {
     fetch(
-      "https://opentdb.com/api.php?amount=5&category=23&difficulty=medium&type=multiple"
+      "https://opentdb.com/api.php?amount=5&category=19&difficulty=medium&type=multiple"
     )
       .then((res) => res.json())
       .then((data) => setApiData(data.results))
@@ -26,24 +27,29 @@ function App() {
     const data = apiData.map((entry) => {
       return {
         id: nanoid(),
-        question: entry.question,
-        choices: [
-          ...entry.incorrect_answers.map((entry) => {
-            return { name: entry, status: "" };
-          }),
-          { name: entry.correct_answer, status: "" },
-        ],
-        // choices: [...entry.incorrect_answers, entry.correct_answer],
+        question: decode(entry.question),
+        choices: shuffleChoices(entry),
         answer: entry.correct_answer,
       };
     });
     setFormData((prev) => data);
   }, [apiData]);
 
+  function shuffleChoices(entry) {
+    let choices = entry.incorrect_answers.map((entry) => {
+      return { name: entry, status: "" };
+    });
+    choices.splice(Math.floor(Math.random() * 4), 0, {
+      name: entry.correct_answer,
+      status: "",
+    });
+    return choices;
+  }
+
   function submitForm(e) {
     e.preventDefault();
     setFormSubmitted(true);
-    console.log(formData);
+
     let gameScore = score;
     formData.forEach((item) => {
       gameScore = item.checked === item.answer ? gameScore + 1 : gameScore;
@@ -52,9 +58,6 @@ function App() {
       return prevData.map((item) => {
         console.log(item);
         if (item.checked === item.answer) {
-          // update choice status to green
-          // return {...item, item.choices[item.answer].status = "green"};
-          // return { ...item, choices: [...item.choices] };
           return {
             ...item,
             choices: [
@@ -67,10 +70,6 @@ function App() {
             ],
           };
         } else {
-          // update choice status to red and highlight right choice
-          // item.choices[item.checked].status = "red";
-          // item.choices[item.answer].status = "green";
-          // return { ...item, choices: [...item.choices] };
           return {
             ...item,
             choices: [
@@ -90,13 +89,10 @@ function App() {
         }
       });
     });
-
-    console.log(formData);
     setScore(gameScore);
   }
 
   const questions = formData.map((item) => {
-    // const id = nanoid();
     return (
       <li key={item.id} id={item.id}>
         <legend>
@@ -109,7 +105,6 @@ function App() {
 
   function choiceElements(id, checked, choices) {
     return choices.map((item) => {
-      // const status = item.status;
       return !formSubmitted ? (
         <>
           <label className={item.status + " custom-radio"} htmlFor={item.name}>
@@ -154,7 +149,6 @@ function App() {
   return (
     <div className="container">
       <main>
-        {/* <button onClick={getQuestions}>Get Data</button> */}
         {screen === "screen1" && <Cover handleClick={getQuestions} />}
         {screen === "screen2" && (
           <form onSubmit={submitForm} className="questionaire">
@@ -163,7 +157,9 @@ function App() {
             </fieldset>
             {formSubmitted ? (
               <>
-                <p>Score: {score}/5</p>
+                <p>
+                  Score: {score} / {formData.length}
+                </p>
                 <button onClick={getQuestions}>Play Again</button>
               </>
             ) : (
