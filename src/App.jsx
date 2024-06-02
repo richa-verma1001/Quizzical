@@ -27,7 +27,13 @@ function App() {
       return {
         id: nanoid(),
         question: entry.question,
-        choices: [...entry.incorrect_answers, entry.correct_answer],
+        choices: [
+          ...entry.incorrect_answers.map((entry) => {
+            return { name: entry, status: "" };
+          }),
+          { name: entry.correct_answer, status: "" },
+        ],
+        // choices: [...entry.incorrect_answers, entry.correct_answer],
         answer: entry.correct_answer,
       };
     });
@@ -39,18 +45,53 @@ function App() {
     setFormSubmitted(true);
     console.log(formData);
     let gameScore = score;
-    // formData.forEach((item) => {
-    //   gameScore = item.checked === item.answer ? gameScore + 1 : gameScore;
-    // });
-
-    formData.map((item) => {
+    formData.forEach((item) => {
       gameScore = item.checked === item.answer ? gameScore + 1 : gameScore;
-      // console.log(item);
-      // return item.choices.map( (choice) => {
-
-      // })
-      return;
     });
+    setFormData((prevData) => {
+      return prevData.map((item) => {
+        console.log(item);
+        if (item.checked === item.answer) {
+          // update choice status to green
+          // return {...item, item.choices[item.answer].status = "green"};
+          // return { ...item, choices: [...item.choices] };
+          return {
+            ...item,
+            choices: [
+              ...item.choices.map((choice) => {
+                return {
+                  name: choice.name,
+                  status: choice.name === item.answer ? "green" : "",
+                };
+              }),
+            ],
+          };
+        } else {
+          // update choice status to red and highlight right choice
+          // item.choices[item.checked].status = "red";
+          // item.choices[item.answer].status = "green";
+          // return { ...item, choices: [...item.choices] };
+          return {
+            ...item,
+            choices: [
+              ...item.choices.map((choice) => {
+                let colorStatus = "";
+                if (choice.name === item.checked) colorStatus = "red";
+                else if (choice.name == item.answer) {
+                  colorStatus = "green";
+                }
+                return {
+                  name: choice.name,
+                  status: colorStatus,
+                };
+              }),
+            ],
+          };
+        }
+      });
+    });
+
+    console.log(formData);
     setScore(gameScore);
   }
 
@@ -58,7 +99,9 @@ function App() {
     // const id = nanoid();
     return (
       <li key={item.id} id={item.id}>
-        <legend>{item.question}</legend>
+        <legend>
+          <h5>{item.question}</h5>
+        </legend>
         {choiceElements(item.id, item.checked, item.choices)}
       </li>
     );
@@ -66,27 +109,34 @@ function App() {
 
   function choiceElements(id, checked, choices) {
     return choices.map((item) => {
+      // const status = item.status;
       return !formSubmitted ? (
         <>
-          <input
-            type="radio"
-            name={id}
-            value={item}
-            checked={checked === item}
-            onChange={handleFormChange}
-          />
-          <label htmlFor={item}>{item}</label>
+          <label className={item.status + " custom-radio"} htmlFor={item.name}>
+            <input
+              type="radio"
+              name={id}
+              value={item.name}
+              checked={checked === item.name}
+              onChange={handleFormChange}
+            />
+            <span class="custom-radio-button"></span>
+            {item.name}
+          </label>
         </>
       ) : (
         <>
-          <input
-            type="radio"
-            name={id}
-            value={item}
-            checked={checked === item}
-            onChange={handleFormChange}
-          />
-          <label htmlFor={item}>{item}</label>
+          <label className={item.status + " custm-radio"} htmlFor={item.name}>
+            <input
+              type="radio"
+              name={id}
+              value={item.name}
+              checked={checked === item.name}
+              onChange={handleFormChange}
+            />
+            <span class="custom-radio-button"></span>
+            {item.name}
+          </label>
         </>
       );
     });
@@ -107,7 +157,7 @@ function App() {
         {/* <button onClick={getQuestions}>Get Data</button> */}
         {screen === "screen1" && <Cover handleClick={getQuestions} />}
         {screen === "screen2" && (
-          <form onSubmit={submitForm}>
+          <form onSubmit={submitForm} className="questionaire">
             <fieldset>
               <ul>{questions}</ul>
             </fieldset>
@@ -117,7 +167,7 @@ function App() {
                 <button onClick={getQuestions}>Play Again</button>
               </>
             ) : (
-              <button>Submit</button>
+              <button className="frontpage__start-game">Submit</button>
             )}
           </form>
         )}
