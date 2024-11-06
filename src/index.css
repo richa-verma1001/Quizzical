@@ -74,6 +74,10 @@ form {
   flex-direction: column;
 }
 
+ul{
+  padding-inline-start: 0;
+}
+
 li {
   list-style: none;
 }
@@ -149,10 +153,6 @@ li {
 @media (max-width: 640px) {
   .container {
     width: 90vw;
-    height: 100vh;
-  }
-
-  ul {
-    margin-left: 5px;
+    height: 100vh;    
   }
 }
